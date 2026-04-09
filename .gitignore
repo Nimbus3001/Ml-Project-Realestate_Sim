@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+.venv/
+
+# Data (IMPORTANT - don’t upload dataset)
+data/
+
+# Model files
+*.pkl
+
+# OS files
+.DS_Store
+Thumbs.db
