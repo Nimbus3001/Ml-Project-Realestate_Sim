@@ -35,8 +35,11 @@ def predict_growth(img_path):
 
 # 🔹 TEST WITH IMAGE
 if __name__ == "__main__":
-    test_image = "test1.jpg"  # 👈 change this
-
-    result = predict_growth(test_image)
-
-    print("\nPrediction:", result)
+    test_images = ["test.jpg", "test1.jpg", "test2.jpg"]
+    
+    for test_image in test_images:
+        try:
+            result = predict_growth(test_image)
+            print(f"Prediction for {test_image}: {result}")
+        except Exception as e:
+            print(f"Error processing {test_image}: {e}")
