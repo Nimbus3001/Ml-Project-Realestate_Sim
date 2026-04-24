@@ -2,111 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Green Zones | Urbanization Predictor</title>
+    <title>🌿 Green Zones – Urbanization Predictor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 2rem;
-            background: #121212;
-        }
-        .page-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .page-header h1 {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #F5F5F5;
-            letter-spacing: -0.03em;
-        }
-        .page-header p {
-            color: #9E9E9E;
-            margin-top: 0.5rem;
-            font-size: 1rem;
-        }
-        .image-card {
-            width: 100%;
-            max-width: 860px;
-            background: rgba(40,40,40,0.8);
-            border: 1px solid rgba(158,158,158,0.2);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-        }
-        .image-card img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .image-card .caption {
-            padding: 1rem 1.5rem;
-            color: #9E9E9E;
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(158,158,158,0.15);
-            background: rgba(30,30,30,0.9);
-        }
-        .back-btn {
-            margin-top: 2rem;
-            padding: 0.85rem 2rem;
-            background: #E0E0E0;
-            color: #121212;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.2s, transform 0.1s;
-        }
-        .back-btn:hover {
-            background: #BDBDBD;
-            transform: translateY(-2px);
-        }
-        .legend {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            margin-top: 1.5rem;
-            color: #9E9E9E;
-            font-size: 0.9rem;
-        }
-        .legend-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #00FF00;
-            box-shadow: 0 0 8px #00FF00;
-        }
+        /* ----- Core ----- */
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#0d0d12;color:#e0e0e0;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .container{position:relative;background:#111;max-width:900px;width:100%;border-radius:20px;overflow:hidden;box-shadow:0 0 30px rgba(0,0,0,.7)}
+        h1{font-size:2.4rem;text-align:center;padding:1rem 0;background:linear-gradient(135deg,#00f,#a0f);-webkit-background-clip:text;color:transparent}
+        /* ----- Animated Gradient Background ----- */
+        .bg{position:absolute;inset:0;z-index:-2;background:linear-gradient(45deg,#0d0d12,#111,#0d0d12);
+            background-size:400% 400%;animation:bgMove 20s ease infinite}
+        @keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+        /* ----- Image Card ----- */
+        .card{position:relative;padding:1rem;display:flex;flex-direction:column;align-items:center}
+        .card img{max-width:100%;border-radius:12px;border:3px solid #00ff80;box-shadow:0 0 20px #00ff80 inset;animation:glow 2s ease-in-out infinite alternate}
+        @keyframes glow{from{box-shadow:0 0 10px #00ff80 inset}to{box-shadow:0 0 30px #00ff80 inset}}
+        /* ----- Racing line overlay ----- */
+        .racing-line{position:absolute;top:0;left:-30%;width:30%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
+            transform:skewX(-20deg);animation:lineMove 1.5s linear infinite}
+        @keyframes lineMove{to{left:120%}}
+        /* ----- Back button ----- */
+        .back{margin:1rem auto;display:block;padding:.8rem 2rem;background:#0055ff;color:#fff;border:none;border-radius:8px;cursor:pointer;transition:transform .2s,background .2s; text-decoration:none; font-weight:600}
+        .back:hover{background:#0066ff;transform:scale(1.05)}
     </style>
 </head>
 <body>
-    <div class="page-header">
+    <div class="bg"></div>
+    <div class="container">
         <h1>🌿 Green Zone Analysis</h1>
-        <p>Vegetation and growth-potential areas detected and highlighted in green</p>
-    </div>
-
-    <div class="image-card">
-        <img src="/api/highlight_image/{{ filename }}" alt="Green Zones Highlighted"
-             onerror="this.src=''; this.alt='Error loading image. The uploaded file may have expired.';">
-        <div class="caption">
-            Analysed file: <strong>{{ filename }}</strong>
+        <div class="card">
+            <div class="racing-line"></div>
+            <img src="/api/highlight_image/{{ filename }}" alt="Green zones highlighted" onerror="this.alt='Failed to load image.'">
         </div>
+        <a class="back" href="/">← Back to Predictor</a>
     </div>
-
-    <div class="legend">
-        <div class="legend-dot"></div>
-        <span>Highlighted pixels indicate detected vegetation / green zones</span>
-    </div>
-
-    <a class="back-btn" href="/">← Back to Predictor</a>
 </body>
 </html>

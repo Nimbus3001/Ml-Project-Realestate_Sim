@@ -2,51 +2,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Urbanization Predictor</title>
+    <title>🚀 Urbanization Predictor (Flashy)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; background: #f0f0f0; display: flex; justify-content: center; padding: 40px 16px; }
-        .card { background: white; border-radius: 10px; padding: 32px; width: 100%; max-width: 520px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
-        h1 { font-size: 1.4rem; margin-bottom: 24px; color: #222; }
-        label { display: block; margin-bottom: 6px; font-weight: bold; color: #444; font-size: 0.9rem; }
-        input[type=file] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; margin-bottom: 16px; }
-        button[type=submit] { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-        button[type=submit]:hover { background: #111; }
-        .error { margin-top: 16px; padding: 12px; background: #fee; border: 1px solid #f99; border-radius: 6px; color: #c00; font-size: 0.9rem; }
-        .result { margin-top: 24px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
-        .result .growth { font-size: 1.8rem; font-weight: 900; color: #222; margin-bottom: 12px; }
-        .result .probs { list-style: none; margin-bottom: 20px; }
-        .result .probs li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 0.95rem; color: #444; }
-        .result .probs li span { font-weight: bold; color: #222; }
-        .gz-btn { display: block; width: 100%; padding: 12px; background: #2d7a2d; color: white; border-radius: 6px; text-align: center; text-decoration: none; font-size: 1rem; font-weight: bold; margin-top: 4px; }
-        .gz-btn:hover { background: #1a5c1a; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#0a0a12;color:#e0e0e0;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .bg{position:absolute;inset:0;background:linear-gradient(45deg,#0a0a12,#111,#0a0a12);background-size:400% 400%;animation:bgMove 20s ease infinite;z-index:-2}
+        @keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+        .card{background:#111;padding:2rem;border-radius:20px;max-width:900px;width:100%;box-shadow:0 0 30px rgba(0,0,0,.7);position:relative;overflow:hidden}
+        h1{font-size:2.4rem;text-align:center;background:linear-gradient(135deg,#00f,#a0f);-webkit-background-clip:text;color:transparent;margin-bottom:1rem}
+        .upload-zone{border:2px dashed #00ff80;padding:2rem;text-align:center;border-radius:12px;cursor:pointer;position:relative;transition:transform .3s}
+        .upload-zone:hover{transform:scale(1.02)}
+        .upload-zone input{display:none}
+        .preview{margin-top:1rem;max-width:100%;border-radius:12px;border:3px solid #00ff80;box-shadow:0 0 20px #00ff80 inset;display:none}
+        .btn{margin-top:1.5rem;padding:.8rem 2rem;background:#00ff80;color:#111;border:none;border-radius:8px;font-weight:800;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center}
+        .btn:hover{background:#00e070}
+        .racing-line{position:absolute;top:0;left:-30%;width:30%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transform:skewX(-20deg);animation:lineMove 1.5s linear infinite}
+        @keyframes lineMove{to{left:120%}}
+        .result{margin-top:1.5rem;padding:1rem;background:#222;border-radius:12px;display:none}
+        .result h2{font-size:1.8rem;margin-bottom:.5rem}
+        .gz-link{margin-top:1rem;padding:.6rem 1.5rem;background:#0055ff;color:#fff;border:none;border-radius:6px;cursor:pointer;display:inline-block;text-decoration:none;transition:.2s}
+        .gz-link:hover{background:#0066ff}
     </style>
 </head>
 <body>
-<div class="card">
-    <h1>🏙️ Urbanization Growth Predictor</h1>
-
-    <form method="POST" action="/predict2" enctype="multipart/form-data">
-        <label for="file">Upload a satellite image (JPG / PNG):</label>
-        <input type="file" id="file" name="file" accept="image/png,image/jpeg,image/jpg" required>
-        <button type="submit">Run Prediction</button>
-    </form>
-
-    {% if error %}
-    <div class="error">{{ error }}</div>
-    {% endif %}
-
-    {% if result %}
-    <div class="result">
-        <div class="growth">{{ result.label }} Growth</div>
-        <ul class="probs">
-            <li>Low &nbsp;<span>{{ (result.probabilities.Low * 100) | round(1) }}%</span></li>
-            <li>Medium <span>{{ (result.probabilities.Medium * 100) | round(1) }}%</span></li>
-            <li>High &nbsp;<span>{{ (result.probabilities.High * 100) | round(1) }}%</span></li>
-        </ul>
-        <a class="gz-btn" href="/gzones2/{{ filename }}">🌿 View Green Zones</a>
+    <div class="bg"></div>
+    <div class="card">
+        <h1>🚀 Urbanization Predictor</h1>
+        <div class="upload-zone" id="dropZone">
+            <p>Click or drag an image (JPG/PNG) here</p>
+            <input type="file" id="fileInput" accept="image/*">
+            <img id="previewImg" class="preview" src="" alt="preview">
+        </div>
+        <button class="btn" id="predictBtn" disabled>Run Prediction</button>
+        <div class="result" id="resultBox">
+            <h2 id="label"></h2>
+            <ul id="probs"></ul>
+            <a id="gzLink" class="gz-link" href="#">🌿 View Green Zones</a>
+        </div>
+        <div class="racing-line"></div>
     </div>
-    {% endif %}
-</div>
+    <script>
+        const dropZone=document.getElementById('dropZone');
+        const fileInput=document.getElementById('fileInput');
+        const previewImg=document.getElementById('previewImg');
+        const predictBtn=document.getElementById('predictBtn');
+        const resultBox=document.getElementById('resultBox');
+        const labelEl=document.getElementById('label');
+        const probsEl=document.getElementById('probs');
+        const gzLink=document.getElementById('gzLink');
+        let currentFilename='';
+
+        dropZone.addEventListener('click',()=>fileInput.click());
+        fileInput.addEventListener('change',handleFiles);
+        dropZone.addEventListener('dragover',e=>{e.preventDefault();});
+        dropZone.addEventListener('drop',e=>{e.preventDefault();fileInput.files=e.dataTransfer.files;handleFiles();});
+
+        function handleFiles(){
+            const file=fileInput.files[0];
+            if(!file) return;
+            previewImg.src=URL.createObjectURL(file);
+            previewImg.style.display='block';
+            predictBtn.disabled=false;
+        }
+
+        predictBtn.addEventListener('click',async ()=>{
+            predictBtn.disabled=true;
+            const form=new FormData();
+            form.append('file',fileInput.files[0]);
+            const res=await fetch('/predict2',{method:'POST',body:form});
+            const data=await res.json();
+            if(data.result){
+                labelEl.textContent=data.result.label+' Growth';
+                probsEl.innerHTML='';
+                for(const [k,v] of Object.entries(data.result.probabilities)){
+                    const li=document.createElement('li');
+                    li.textContent=`${k}: ${(v*100).toFixed(1)}%`;
+                    probsEl.appendChild(li);
+                }
+                currentFilename=data.filename;
+                gzLink.href=`/gzones2/${encodeURIComponent(currentFilename)}`;
+                resultBox.style.display='block';
+            }else{
+                alert(data.error||'Prediction error');
+            }
+            predictBtn.disabled=false;
+        });
+    </script>
 </body>
 </html>
