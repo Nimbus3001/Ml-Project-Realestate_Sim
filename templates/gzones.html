@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Zones | Urbanization Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2rem;
+            background: #121212;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .page-header h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #F5F5F5;
+            letter-spacing: -0.03em;
+        }
+        .page-header p {
+            color: #9E9E9E;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+        .image-card {
+            width: 100%;
+            max-width: 860px;
+            background: rgba(40,40,40,0.8);
+            border: 1px solid rgba(158,158,158,0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        .image-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .image-card .caption {
+            padding: 1rem 1.5rem;
+            color: #9E9E9E;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(158,158,158,0.15);
+            background: rgba(30,30,30,0.9);
+        }
+        .back-btn {
+            margin-top: 2rem;
+            padding: 0.85rem 2rem;
+            background: #E0E0E0;
+            color: #121212;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .back-btn:hover {
+            background: #BDBDBD;
+            transform: translateY(-2px);
+        }
+        .legend {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 1.5rem;
+            color: #9E9E9E;
+            font-size: 0.9rem;
+        }
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #00FF00;
+            box-shadow: 0 0 8px #00FF00;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>🌿 Green Zone Analysis</h1>
+        <p>Vegetation and growth-potential areas detected and highlighted in green</p>
+    </div>
+
+    <div class="image-card">
+        <img src="/api/highlight_image/{{ filename }}" alt="Green Zones Highlighted"
+             onerror="this.src=''; this.alt='Error loading image. The uploaded file may have expired.';">
+        <div class="caption">
+            Analysed file: <strong>{{ filename }}</strong>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-dot"></div>
+        <span>Highlighted pixels indicate detected vegetation / green zones</span>
+    </div>
+
+    <a class="back-btn" href="/">← Back to Predictor</a>
+</body>
+</html>

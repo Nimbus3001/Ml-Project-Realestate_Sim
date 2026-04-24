@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Zones | GoLiquid Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .highlight-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            width: 100%;
+        }
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 2px solid var(--gold-main);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px var(--gold-glow);
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .btn-container {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG Gooey Filter Definition -->
+    <svg style="position: absolute; width: 0; height: 0;" xmlns="http://www.w3.org/2000/svg" version="1.1">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 25 -10" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- Liquid Animated Background -->
+    <div class="liquid-container">
+        <div class="liquid-drop drop1"></div>
+        <div class="liquid-drop drop2"></div>
+        <div class="liquid-drop drop3"></div>
+    </div>
+    <div class="texture-overlay"></div>
+
+    <!-- Main Liquid Box -->
+    <main class="main-app" style="max-width: 900px; margin: 2rem auto;">
+        <header class="header">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--gold-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <h1>Vegetation Distillation</h1>
+        </header>
+
+        <div class="highlight-container">
+            <p style="color: var(--text-sec); text-align: center; font-size: 1.1rem;">
+                Areas of significant vegetation and growth potential have been extracted and illuminated in pure green.
+            </p>
+            
+            <div class="image-wrapper">
+                <img src="/api/highlight_image/{{ filename }}" alt="Green Zones Highlighted">
+            </div>
+
+            <div class="btn-container">
+                <button class="analyze-btn" onclick="window.location.href='/'">
+                    <span>Return to Predictor</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Liquid UI Scripts for Cursor (Optional but keeps aesthetic) -->
+    <div id="cursor-container">
+        <div class="cursor-blob" id="main-cursor"></div>
+    </div>
+    <script>
+        const cursorContainer = document.getElementById('cursor-container');
+        const mainCursor = document.getElementById('main-cursor');
+        
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            mainCursor.style.left = `${mouseX}px`;
+            mainCursor.style.top = `${mouseY}px`;
+            createTrailDrop(mouseX, mouseY);
+        });
+
+        function createTrailDrop(x, y) {
+            const drop = document.createElement('div');
+            drop.className = 'cursor-trail';
+            drop.style.left = `${x}px`;
+            drop.style.top = `${y}px`;
+            
+            const size = Math.random() * 12 + 8;
+            drop.style.width = `${size}px`;
+            drop.style.height = `${size}px`;
+            
+            cursorContainer.appendChild(drop);
+
+            setTimeout(() => {
+                drop.style.transition = 'all 0.6s ease-out';
+                drop.style.transform = `translate(-50%, -50%) scale(0)`;
+                drop.style.opacity = '0';
+            }, 10);
+
+            setTimeout(() => {
+                drop.remove();
+            }, 610);
+        }
+
+        document.addEventListener('mousedown', () => {
+            mainCursor.style.width = '35px';
+            mainCursor.style.height = '15px';
+        });
+        document.addEventListener('mouseup', () => {
+            mainCursor.style.width = '24px';
+            mainCursor.style.height = '24px';
+        });
+    </script>
+</body>
+</html>

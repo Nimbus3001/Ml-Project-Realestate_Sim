@@ -23,14 +23,34 @@ def predict_growth(img_path):
     features = np.array(features).reshape(1, -1)
 
     prediction = model.predict(features)[0]
+    # Predict proba returns an array for the classes it was trained on
+    proba_array = model.predict_proba(features)[0]
+    classes = getattr(model, 'classes_', [0, 1, 2])
+
+    # Initialize all to 0
+    probs = {"Low": 0.0, "Medium": 0.0, "High": 0.0}
+    
+    # Map the probabilities to the correct class labels
+    for cls, prob in zip(classes, proba_array):
+        if cls == 0:
+            probs["Low"] = float(prob)
+        elif cls == 1:
+            probs["Medium"] = float(prob)
+        elif cls == 2:
+            probs["High"] = float(prob)
 
     # 🔹 Convert numeric label back to text
     if prediction == 0:
-        return "Low"
+        label = "Low"
     elif prediction == 1:
-        return "Medium"
+        label = "Medium"
     else:
-        return "High"
+        label = "High"
+
+    return {
+        "label": label,
+        "probabilities": probs
+    }
 
 
 # 🔹 TEST WITH IMAGE
