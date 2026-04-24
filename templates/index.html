@@ -1,330 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UrbanPredict | GoLiquid Edition</title>
+    <title>🚀 Urbanization Predictor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Core reset */
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;min-height:100vh;background:#0a0a12;color:#e0e0e0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .bg{position:absolute;inset:0;background:linear-gradient(45deg,#0a0a12,#111,#0a0a12);background-size:400% 400%;animation:bgMove 20s ease infinite;z-index:-2}
+        @keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+        .container{background:#111;padding:2rem;border-radius:20px;max-width:900px;width:100%;box-shadow:0 0 30px rgba(0,0,0,.7);position:relative;overflow:hidden}
+        h1{font-size:2.4rem;text-align:center;background:linear-gradient(135deg,#00f,#a0f);-webkit-background-clip:text;color:transparent;margin-bottom:1rem}
+        .upload-zone{border:2px dashed #00ff80;padding:2rem;text-align:center;border-radius:12px;cursor:pointer;position:relative;transition:transform .3s}
+        .upload-zone:hover{transform:scale(1.02)}
+        .upload-zone input{display:none}
+        .preview{margin-top:1rem;max-width:100%;border-radius:12px;border:3px solid #00ff80;box-shadow:0 0 20px #00ff80 inset}
+        .btn{margin-top:1.5rem;padding:.8rem 2rem;background:#00ff80;color:#111;border:none;border-radius:8px;font-weight:800;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center}
+        .btn:hover{background:#00e070}
+        .racing-line{position:absolute;top:0;left:-30%;width:30%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transform:skewX(-20deg);animation:lineMove 1.5s linear infinite}
+        @keyframes lineMove{to{left:120%}}
+        .result{margin-top:1.5rem;padding:1rem;background:#222;border-radius:12px;display:none}
+        .result h2{font-size:1.8rem;margin-bottom:.5rem}
+        .result ul{list-style:none;margin:0;padding:0}
+        .result li{margin:.3rem 0}
+        .gz-link{margin-top:1rem;padding:.6rem 1.5rem;background:#0055ff;color:#fff;border:none;border-radius:6px;cursor:pointer;display:inline-block;text-decoration:none;transition:.2s}
+        .gz-link:hover{background:#0066ff}
+    </style>
 </head>
-
 <body>
-
-    <!-- SVG Gooey Filter Definition -->
-    <svg style="position: absolute; width: 0; height: 0;" xmlns="http://www.w3.org/2000/svg" version="1.1">
-        <defs>
-            <filter id="goo">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 25 -10"
-                    result="goo" />
-                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-            </filter>
-        </defs>
-    </svg>
-
-    <!-- Liquid Animated Background -->
-    <div class="liquid-container">
-        <div class="liquid-drop drop1"></div>
-        <div class="liquid-drop drop2"></div>
-        <div class="liquid-drop drop3"></div>
-    </div>
-    <div class="texture-overlay"></div>
-
-    <!-- Liquid Cursor Trail -->
-    <div id="cursor-container">
-        <div class="cursor-blob" id="main-cursor"></div>
-    </div>
-
-    <!-- Main Liquid Box -->
-    <main class="main-app">
-        <header class="header">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--gold-light)"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-            </svg>
-            <h1>Urbanization Predictor</h1>
-        </header>
-
-        <div class="app-grid">
-
-            <!-- Left Side -->
-            <section class="upload-section">
-                <!-- Drop zone wrapped for local goo effects -->
-                <div class="goo-wrapper">
-                    <div class="drop-zone" id="drop-zone">
-                        <input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg" hidden>
-
-                        <div id="upload-placeholder">
-                            <svg class="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 4v12m0-12l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
-                            </svg>
-                            <p class="upload-text">Deposit Imagery</p>
-                            <p class="upload-subtext">Merge satellite JPG/PNG (Max 5MB)</p>
-                        </div>
-
-                        <img id="preview-img" class="preview-img" src="" alt="Preview">
-                        <button class="clear-btn" id="clear-btn">✕</button>
-                    </div>
-                </div>
-
-                <button class="analyze-btn" id="analyze-btn" disabled>
-                    <span id="btn-text">Distill Prediction</span>
-                    <div class="liquid-spinner" id="btn-spinner"></div>
-                </button>
-            </section>
-
-            <!-- Right Side: Results -->
-            <section class="results-panel">
-                <div class="results-overlay" id="results-overlay">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                    </svg>
-                    <p>Awaiting Synthesis</p>
-                </div>
-
-                <div class="results-content" id="results-content">
-                    <div class="label-title">Ultimate Projection</div>
-                    <div id="growth-badge" class="growth-badge">--</div>
-
-                    <div class="label-title">Distilled Confidence</div>
-                    <div class="chart-wrapper">
-                        <canvas id="probChart"></canvas>
-                    </div>
-
-                    <div id="gzones-link-container"></div>
-                </div>
-            </section>
+    <div class="bg"></div>
+    <div class="container">
+        <h1>🚀 Urbanization Growth Predictor</h1>
+        <div class="upload-zone" id="dropZone">
+            <p>Click or drag an image (JPG/PNG) here</p>
+            <input type="file" id="fileInput" accept="image/*">
+            <img id="previewImg" class="preview" src="" alt="preview" style="display:none;">
         </div>
-    </main>
-
-    <!-- Liquid UI Scripts -->
+        <button class="btn" id="predictBtn" disabled>Run Prediction</button>
+        <div class="result" id="resultBox">
+            <h2 id="label"></h2>
+            <ul id="probs"></ul>
+            <a id="gzLink" class="gz-link" href="#">🌿 View Green Zones</a>
+        </div>
+        <div class="racing-line"></div>
+    </div>
     <script>
-        // --- Liquid Cursor Trail Logic ---
-        const cursorContainer = document.getElementById('cursor-container');
-        const mainCursor = document.getElementById('main-cursor');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewImg = document.getElementById('previewImg');
+        const predictBtn = document.getElementById('predictBtn');
+        const resultBox = document.getElementById('resultBox');
+        const labelEl = document.getElementById('label');
+        const probsEl = document.getElementById('probs');
+        const gzLink = document.getElementById('gzLink');
+        let currentFileName = '';
 
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFiles);
+        dropZone.addEventListener('dragover', e => {e.preventDefault(); dropZone.style.borderColor = '#00ff80';});
+        dropZone.addEventListener('dragleave', e => {e.preventDefault(); dropZone.style.borderColor = '#00ff80';});
+        dropZone.addEventListener('drop', e => {e.preventDefault(); fileInput.files = e.dataTransfer.files; handleFiles();});
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-
-            // Move main cursor blob instantly
-            mainCursor.style.left = `${mouseX}px`;
-            mainCursor.style.top = `${mouseY}px`;
-
-            // Create a trail drop
-            createTrailDrop(mouseX, mouseY);
-        });
-
-        function createTrailDrop(x, y) {
-            const drop = document.createElement('div');
-            drop.className = 'cursor-trail';
-            drop.style.left = `${x}px`;
-            drop.style.top = `${y}px`;
-
-            // Randomize size slightly
-            const size = Math.random() * 12 + 8;
-            drop.style.width = `${size}px`;
-            drop.style.height = `${size}px`;
-
-            cursorContainer.appendChild(drop);
-
-            // Animate shrink and vanish
-            setTimeout(() => {
-                drop.style.transition = 'all 0.6s ease-out';
-                drop.style.transform = `translate(-50%, -50%) scale(0)`;
-                drop.style.opacity = '0';
-            }, 10);
-
-            // Remove from DOM
-            setTimeout(() => {
-                drop.remove();
-            }, 610);
+        function handleFiles(){
+            const file = fileInput.files[0];
+            if(!file) return;
+            const url = URL.createObjectURL(file);
+            previewImg.src = url;
+            previewImg.style.display = 'block';
+            predictBtn.disabled = false;
         }
 
-        // Add fun squash/stretch to cursor on click
-        document.addEventListener('mousedown', () => {
-            mainCursor.style.width = '35px';
-            mainCursor.style.height = '15px';
-        });
-        document.addEventListener('mouseup', () => {
-            mainCursor.style.width = '24px';
-            mainCursor.style.height = '24px';
-        });
-
-        // --- Drag / Drop & Core App Logic ---
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const uploadPlaceholder = document.getElementById('upload-placeholder');
-        const previewImg = document.getElementById('preview-img');
-        const clearBtn = document.getElementById('clear-btn');
-        const analyzeBtn = document.getElementById('analyze-btn');
-        const btnText = document.getElementById('btn-text');
-        const btnSpinner = document.getElementById('btn-spinner');
-
-        const resultsOverlay = document.getElementById('results-overlay');
-        const resultsContent = document.getElementById('results-content');
-        const growthBadge = document.getElementById('growth-badge');
-
-        let selectedFile = null;
-        let chartInstance = null;
-
-        dropZone.addEventListener('click', (e) => {
-            if (e.target !== clearBtn) fileInput.click();
-        });
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
-            dropZone.addEventListener(ev, e => {
-                e.preventDefault(); e.stopPropagation();
-            });
-        });
-
-        ['dragenter', 'dragover'].forEach(ev => dropZone.classList.add('dragging'));
-        ['dragleave', 'drop'].forEach(ev => dropZone.classList.remove('dragging'));
-
-        dropZone.addEventListener('drop', (e) => {
-            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) handleFile(e.target.files[0]);
-        });
-
-        clearBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            resetUpload();
-        });
-
-        function handleFile(file) {
-            if (!file.type.startsWith('image/')) { alert('Please upload an image.'); return; }
-            selectedFile = file;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                uploadPlaceholder.style.display = 'none';
-                previewImg.src = ev.target.result;
-                previewImg.style.display = 'block';
-                clearBtn.style.display = 'flex';
-                analyzeBtn.removeAttribute('disabled');
-                resetResults();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function resetUpload() {
-            selectedFile = null;
-            fileInput.value = '';
-            previewImg.style.display = 'none'; previewImg.src = '';
-            clearBtn.style.display = 'none';
-            uploadPlaceholder.style.display = 'flex';
-            analyzeBtn.setAttribute('disabled', 'true');
-            resetResults();
-        }
-
-        function resetResults() {
-            resultsOverlay.style.opacity = '1';
-            resultsContent.classList.remove('active');
-            if (chartInstance) chartInstance.destroy();
-            document.getElementById('gzones-link-container').innerHTML = '';
-        }
-
-        analyzeBtn.addEventListener('click', async () => {
-            if (!selectedFile) return;
-
-            analyzeBtn.setAttribute('disabled', 'true');
-            btnText.style.display = 'none';
-            btnSpinner.style.display = 'block';
-            clearBtn.style.display = 'none';
-
-            const formData = new FormData();
-            formData.append('file', selectedFile);
-
-            try {
-                const res = await fetch('/predict', { method: 'POST', body: formData });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Connection severed');
-                renderResults(data);
-            } catch (err) {
-                alert('Distillation Failed: ' + err.message);
-            } finally {
-                analyzeBtn.removeAttribute('disabled');
-                btnText.style.display = 'block';
-                btnSpinner.style.display = 'none';
-                clearBtn.style.display = 'flex';
-            }
-        });
-
-        function renderResults(data) {
-            const { growth, probabilities, filename } = data;
-
-            resultsOverlay.style.opacity = '0';
-            setTimeout(() => resultsContent.classList.add('active'), 300);
-
-            growthBadge.textContent = growth + " GROWTH";
-
-            // Inject a fresh anchor with the correct href - guaranteed to work
-            const container = document.getElementById('gzones-link-container');
-            container.innerHTML = '';
-            const link = document.createElement('a');
-            link.href = '/gzones/' + encodeURIComponent(filename);
-            link.textContent = '\uD83C\uDF3F View Green Zones';
-            link.style.cssText = 'display:block; margin-top:1.5rem; padding:0.85rem 2rem; background:#E0E0E0; color:#121212; border-radius:12px; font-size:1rem; font-weight:700; font-family:Inter,sans-serif; text-decoration:none; text-align:center; cursor:pointer;';
-            container.appendChild(link);
-
-            const ctx = document.getElementById('probChart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-
-            // Sleek Grey colors
-            const greyLight = '#E0E0E0';
-            const greyMain = '#9E9E9E';
-            const greyDark = '#616161';
-
-            chartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Low', 'Medium', 'High'],
-                    datasets: [{
-                        data: [
-                            (probabilities.Low * 100).toFixed(1),
-                            (probabilities.Medium * 100).toFixed(1),
-                            (probabilities.High * 100).toFixed(1)
-                        ],
-                        backgroundColor: [greyLight, greyMain, greyDark],
-                        borderColor: '#121212', // match dark bg
-                        borderWidth: 4,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#BDBDBD', font: { family: 'Inter', size: 13, weight: 'bold' } } },
-                        tooltip: { backgroundColor: 'rgba(158,158,158,0.2)', titleColor: '#E0E0E0', bodyFont: { family: 'Inter', size: 14, weight: 'bold' }, borderColor: '#9E9E9E', borderWidth: 1 }
-                    },
-                    animation: { animateScale: true, animateRotate: true, duration: 1500, easing: 'easeOutElastic' }
+        predictBtn.addEventListener('click', async () => {
+            predictBtn.disabled = true;
+            const form = new FormData();
+            form.append('file', fileInput.files[0]);
+            const res = await fetch('/predict', {method:'POST', body:form});
+            const data = await res.json();
+            if(data.success){
+                labelEl.textContent = data.growth + ' Growth';
+                probsEl.innerHTML = '';
+                for(const [k,v] of Object.entries(data.probabilities)){
+                    const li = document.createElement('li');
+                    li.textContent = `${k}: ${(v*100).toFixed(1)}%`;
+                    probsEl.appendChild(li);
                 }
-            });
-        }
-
-        function goToGzones() {
-            const btn = document.getElementById('highlight-btn');
-            const fn = btn.getAttribute('data-filename');
-            if (fn) {
-                window.location.href = '/gzones/' + encodeURIComponent(fn);
+                currentFileName = data.filename;
+                gzLink.href = `/gzones/${encodeURIComponent(currentFileName)}`;
+                resultBox.style.display = 'block';
+            } else {
+                alert(data.error || 'Prediction failed');
             }
-        }
+            predictBtn.disabled = false;
+        });
     </script>
 </body>
-
 </html>
